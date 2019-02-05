@@ -14,7 +14,6 @@
 		
 		<script src="http://threejsplaygnd.brangerbriz.net/js/three.min.js"></script>
 		<script src="http://threejsplaygnd.brangerbriz.net/js/Detector.js"></script>
-		<script src="http://brangerbriz.net/labs/threejs_playGnd/js/ShaderToon.js"></script>
 		<script>
 
 			if ( ! Detector.webgl ) Detector.addGetWebGLMessage();
@@ -25,7 +24,8 @@
 			function setup() {
 
 				var W = window.innerWidth, H = window.innerHeight;
-				renderer = new THREE.WebGLRenderer();
+				renderer = new THREE.WebGLRenderer( { preserveDrawingBuffer: true } );
+				renderer.autoClearColor = false;
 				renderer.setSize( W, H );
 				document.body.appendChild( renderer.domElement );
 
@@ -33,38 +33,27 @@
 				camera.position.z = 500;
 
 				scene = new THREE.Scene();
-
-				directionalLight = new THREE.DirectionalLight(0xffffff);
-				directionalLight.position.set( 0.96, 1.78, 0 );
-				scene.add( directionalLight );
-
-				ambientLight = new THREE.AmbientLight( 0x080808 );
-				scene.add( ambientLight );
-			}
 				
-			function createShaderMaterial( id, directionalLight, ambientLight ) {
-				var shader = THREE.ShaderToon[ id ];
-				var u = THREE.UniformsUtils.clone( shader.uniforms );
-				var vs = shader.vertexShader;
-				var fs = shader.fragmentShader;
-				var material = createShaderMaterial( "hatched", directionalLight, ambientLight );
-				material.uniforms.uBaseColor.value.setHex( 0x006700 );
-				material.uniforms.uLineColor1.value.setHex( 0xff02ff );
-				( { uniforms: u, vertexShader: vs, fragmentShader: fs } );
-				material.uniforms.uDirLightPos.value = light.position;
-				material.uniforms.uDirLightColor.value = light.color;
-				material.uniforms.uAmbientLightColor.value = ambientLight.color;
-				return material;
-				}
-				 
+				
+				geometry = new THREE.TorusGeometry(100, 24.73, 40, 23, 43.98);
+				material = new THREE.MeshNormalMaterial({shading: THREE.FlatShading});
+				mesh = new THREE.Mesh(geometry, material);
+				scene.add(mesh);
+
+
+			}
 
 			function draw() {
 
 				requestAnimationFrame( draw );
 				
-				// experiment with code from the snippets menu here
+				var s = Math.sin( Date.now() * 0.002 );
+				mesh.material.color.setHSL(0.5, s, 0.5 );
 
 				renderer.render( scene, camera );
+
+				mesh.position.x = Math.sin( Date.now() * 0.001 ) * 50;  
+				mesh.rotation.z = Date.now() * 0.0005;
 
 			}
 
